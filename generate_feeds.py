@@ -24,19 +24,26 @@ favorite_tags = [
     {"name": "Trans Tim Drake (DCU)", "url": "https://archiveofourown.org/tags/Trans%20Tim%20Drake%20(DCU)/works", "has_rss": False},
 ]
 
-
 # Excluded tags
 excluded_tags = ['Alpha/Beta/Omega Dynamics']
 
-# Headers to mimic a browser request
+# Headers to mimic a browser request and avoid caching
 headers = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+    'Cache-Control': 'no-cache, no-store, must-revalidate',
+    'Pragma': 'no-cache',
+    'Expires': '0'
 }
 
 def create_rss_for_tag(tag_info):
     """Create an RSS feed for a tag that doesn't have one natively"""
     tag_name = tag_info["name"]
-    url = tag_info["url"] + "?work_search%5Bsort_column%5D=revised_at"
+    
+    # Start with a clean URL
+    url = tag_info["url"]
+    
+    # Add explicit sorting by updated date (descending order)
+    url += "?work_search%5Bsort_column%5D=revised_at&work_search%5Bsort_direction%5D=desc"
     
     # Add filter to exclude Explicit works
     url += "&work_search%5Brating_ids%5D=10&work_search%5Brating_ids%5D=11&work_search%5Brating_ids%5D=12&work_search%5Brating_ids%5D=9"
@@ -45,12 +52,24 @@ def create_rss_for_tag(tag_info):
     for excluded_tag in excluded_tags:
         url += f"&work_search%5Bexcluded_tag_names%5D={quote(excluded_tag)}"
     
+    print(f"Fetching works from: {url}")
+    
     try:
         response = requests.get(url, headers=headers)
         response.raise_for_status()
         
         soup = BeautifulSoup(response.text, 'html.parser')
         works = soup.select('li.work.blurb.group')
+        
+        print(f"Found {len(works)} works for {tag_name}")
+        
+        if len(works) > 0:
+            first_work = works[0]
+            title_element = first_work.select_one('h4.heading a')
+            title = title_element.text.strip() if title_element else "Untitled Work"
+            date_element = first_work.select_one('p.datetime')
+            date_str = date_element.text.strip() if date_element else "No date"
+            print(f"Most recent work: {title} ({date_str})")
         
         # Create the feed
         feed = feedgenerator.Atom1Feed(
@@ -135,6 +154,9 @@ def create_main_page():
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>AO3 Favorite Tags Feeds</title>
     <style>
         body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
@@ -154,6 +176,9 @@ def create_main_page():
     
     for tag in favorite_tags:
         rss_url = get_rss_url(tag)
+        # Add a timestamp parameter to prevent caching
+        timestamp = int(datetime.datetime.now().timestamp())
+        rss_url_with_timestamp = f"{rss_url}?t={timestamp}"
         html_content += f"""        <li>
             <strong><a href="{tag['url']}" target="_blank">{tag['name']}</a></strong>
             <div class="feed-url">Feed URL: <a href="{rss_url}" target="_blank">{rss_url}</a></div>
