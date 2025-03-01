@@ -116,11 +116,12 @@ def create_rss_for_tag(tag_info):
 def get_rss_url(tag_info):
     """Get the RSS URL for a tag, either from AO3 or our generated feed"""
     if tag_info["has_rss"]:
-        # Extract tag ID from the URL
-        match = re.search(r'tags/([^/]+)/works', tag_info["url"])
-        if match:
-            tag_id = match.group(1)
-            return f"https://archiveofourown.org/tags/{tag_id}/feed.atom"
+        # For native AO3 feeds, we need to correct the URL encoding
+        tag_url = tag_info["url"]
+        # Replace the works part with feed.atom
+        feed_url = tag_url.replace("/works", "/feed.atom")
+        # Return the corrected URL
+        return feed_url
     
     # For tags without RSS, use our generated feed
     safe_tag_name = re.sub(r'[^\w\s]', '', tag_info["name"]).replace(' ', '_').lower()
