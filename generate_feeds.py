@@ -124,7 +124,7 @@ def get_rss_url(tag_info):
     
     # For tags without RSS, use our generated feed
     safe_tag_name = re.sub(r'[^\w\s]', '', tag_info["name"]).replace(' ', '_').lower()
-    return f"https://mor-lays.github.io/favao3tags/feeds/{safe_tag_name}.xml"
+    return f"https://mor-lays.github.io/ao3favtags/feeds/{safe_tag_name}.xml"
 
 def create_main_page():
     """Create a main HTML page listing all feeds"""
