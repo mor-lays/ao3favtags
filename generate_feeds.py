@@ -9,20 +9,21 @@ from urllib.parse import quote
 
 # List of your favorite tags with their URLs
 favorite_tags = [
-    {"name": "Batfamily Members & Bruce Wayne", "url": "https://archiveofourown.org/tags/Batfamily%20Members%20*a*%20Bruce%20Wayne/works", "has_rss": True},
-    {"name": "Clark Kent/Bruce Wayne", "url": "https://archiveofourown.org/tags/Clark%20Kent*s*Bruce%20Wayne/works", "has_rss": True},
-    {"name": "Derek Hale/Stiles Stilinski", "url": "https://archiveofourown.org/tags/Derek%20Hale*s*Stiles%20Stilinski/works", "has_rss": True},
-    {"name": "Dick Grayson/Jason Todd", "url": "https://archiveofourown.org/tags/Dick%20Grayson*s*Jason%20Todd/works", "has_rss": True},
+    {"name": "Batfamily Members & Bruce Wayne", "url": "https://archiveofourown.org/tags/Batfamily%20Members%20*a*%20Bruce%20Wayne/works", "has_rss": False},
+    {"name": "Clark Kent/Bruce Wayne", "url": "https://archiveofourown.org/tags/Clark%20Kent*s*Bruce%20Wayne/works", "has_rss": False},
+    {"name": "Derek Hale/Stiles Stilinski", "url": "https://archiveofourown.org/tags/Derek%20Hale*s*Stiles%20Stilinski/works", "has_rss": False},
+    {"name": "Dick Grayson/Jason Todd", "url": "https://archiveofourown.org/tags/Dick%20Grayson*s*Jason%20Todd/works", "has_rss": False},
     {"name": "Dom Bang Chan (Stray Kids)", "url": "https://archiveofourown.org/tags/Dom%20Bang%20Chan%20(Stray%20Kids)/works", "has_rss": False},
-    {"name": "Evan \"Buck\" Buckley/Eddie Diaz (9-1-1 TV)", "url": "https://archiveofourown.org/tags/Evan%20%22Buck%22%20Buckley*s*Eddie%20Diaz%20(9-1-1%20TV)/works", "has_rss": True},
-    {"name": "Hal Jordan (Green Lantern)/Bruce Wayne", "url": "https://archiveofourown.org/tags/Hal%20Jordan%20(Green%20Lantern)*s*Bruce%20Wayne/works", "has_rss": True},
-    {"name": "Jason Todd/Reader", "url": "https://archiveofourown.org/tags/Jason%20Todd*s*Reader/works", "has_rss": True},
-    {"name": "Marinette Dupain-Cheng | Ladybug/Damian Wayne", "url": "https://archiveofourown.org/tags/Marinette%20Dupain-Cheng%20%7C%20Ladybug*s*Damian%20Wayne/works", "has_rss": True},
-    {"name": "Merlin/Arthur Pendragon (Merlin)", "url": "https://archiveofourown.org/tags/Merlin*s*Arthur%20Pendragon%20(Merlin)/works", "has_rss": True},
-    {"name": "Pack Alpha Derek Hale", "url": "https://archiveofourown.org/tags/Pack%20Alpha%20Derek%20Hale/works", "has_rss": True},
-    {"name": "Tim Drake/Damian Wayne", "url": "https://archiveofourown.org/tags/Tim%20Drake*s*Damian%20Wayne/works", "has_rss": True},
-    {"name": "Trans Tim Drake (DCU)", "url": "https://archiveofourown.org/tags/Trans%20Tim%20Drake%20(DCU)/works", "has_rss": True},
+    {"name": "Evan \"Buck\" Buckley/Eddie Diaz (9-1-1 TV)", "url": "https://archiveofourown.org/tags/Evan%20%22Buck%22%20Buckley*s*Eddie%20Diaz%20(9-1-1%20TV)/works", "has_rss": False},
+    {"name": "Hal Jordan (Green Lantern)/Bruce Wayne", "url": "https://archiveofourown.org/tags/Hal%20Jordan%20(Green%20Lantern)*s*Bruce%20Wayne/works", "has_rss": False},
+    {"name": "Jason Todd/Reader", "url": "https://archiveofourown.org/tags/Jason%20Todd*s*Reader/works", "has_rss": False},
+    {"name": "Marinette Dupain-Cheng | Ladybug/Damian Wayne", "url": "https://archiveofourown.org/tags/Marinette%20Dupain-Cheng%20%7C%20Ladybug*s*Damian%20Wayne/works", "has_rss": False},
+    {"name": "Merlin/Arthur Pendragon (Merlin)", "url": "https://archiveofourown.org/tags/Merlin*s*Arthur%20Pendragon%20(Merlin)/works", "has_rss": False},
+    {"name": "Pack Alpha Derek Hale", "url": "https://archiveofourown.org/tags/Pack%20Alpha%20Derek%20Hale/works", "has_rss": False},
+    {"name": "Tim Drake/Damian Wayne", "url": "https://archiveofourown.org/tags/Tim%20Drake*s*Damian%20Wayne/works", "has_rss": False},
+    {"name": "Trans Tim Drake (DCU)", "url": "https://archiveofourown.org/tags/Trans%20Tim%20Drake%20(DCU)/works", "has_rss": False},
 ]
+
 
 # Excluded tags
 excluded_tags = ['Alpha/Beta/Omega Dynamics']
@@ -168,11 +169,10 @@ def create_main_page():
         file.write(html_content)
 
 def main():
-    # Create RSS feeds for tags that don't have them
+    # Create RSS feeds for all tags
     for tag in favorite_tags:
-        if not tag["has_rss"]:
-            print(f"Creating RSS feed for {tag['name']}...")
-            create_rss_for_tag(tag)
+        print(f"Creating RSS feed for {tag['name']}...")
+        create_rss_for_tag(tag)
         time.sleep(3)  # Be nice to AO3's servers
     
     # Create main HTML page
