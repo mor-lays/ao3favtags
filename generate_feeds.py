@@ -22,6 +22,8 @@ favorite_tags = [
     {"name": "Pack Alpha Derek Hale", "url": "https://archiveofourown.org/tags/Pack%20Alpha%20Derek%20Hale/works", "has_rss": False},
     {"name": "Tim Drake/Damian Wayne", "url": "https://archiveofourown.org/tags/Tim%20Drake*s*Damian%20Wayne/works", "has_rss": False},
     {"name": "Trans Tim Drake (DCU)", "url": "https://archiveofourown.org/tags/Trans%20Tim%20Drake%20(DCU)/works", "has_rss": False},
+    {"name": "Tim Drake/Jason Todd", "url": "https://archiveofourown.org/tags/Tim%20Drake*s*Jason%20Todd/works", "has_rss": False},
+    {"name": "Tim Drake/Dick Grayson/Jason Todd/Damian Wayne", "url": "https://archiveofourown.org/tags/Tim%20Drake*s*Dick%20Grayson*s*Jason%20Todd*s*Damian%20Wayne/works", "has_rss": False},
 ]
 
 # Excluded tags
