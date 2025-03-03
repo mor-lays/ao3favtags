@@ -22,8 +22,6 @@ favorite_tags = [
     {"name": "Pack Alpha Derek Hale", "url": "https://archiveofourown.org/tags/Pack%20Alpha%20Derek%20Hale/works", "has_rss": False},
     {"name": "Tim Drake/Damian Wayne", "url": "https://archiveofourown.org/tags/Tim%20Drake*s*Damian%20Wayne/works", "has_rss": False},
     {"name": "Trans Tim Drake (DCU)", "url": "https://archiveofourown.org/tags/Trans%20Tim%20Drake%20(DCU)/works", "has_rss": False},
-    {"name": "Tim Drake/Jason Todd", "url": "https://archiveofourown.org/tags/Tim%20Drake*s*Jason%20Todd/works", "has_rss": False},
-    {"name": "Tim Drake/Dick Grayson/Jason Todd/Damian Wayne", "url": "https://archiveofourown.org/tags/Tim%20Drake*s*Dick%20Grayson*s*Jason%20Todd*s*Damian%20Wayne/works", "has_rss": False},
 ]
 
 # Excluded tags
@@ -47,8 +45,9 @@ def create_rss_for_tag(tag_info):
     # Add explicit sorting by updated date (descending order)
     url += "?work_search%5Bsort_column%5D=revised_at&work_search%5Bsort_direction%5D=desc"
     
-    # Add filter to exclude Explicit works
-    url += "&work_search%5Brating_ids%5D=10&work_search%5Brating_ids%5D=11&work_search%5Brating_ids%5D=12&work_search%5Brating_ids%5D=9"
+    # Filter out explicit works by including all other ratings
+    # Rating IDs: 10=General, 11=Teen, 12=Mature, 9=Not Rated
+    url += "&work_search%5Brating_ids%5D%5B%5D=10&work_search%5Brating_ids%5D%5B%5D=11&work_search%5Brating_ids%5D%5B%5D=12&work_search%5Brating_ids%5D%5B%5D=9"
     
     # Add filter to exclude Alpha/Beta/Omega Dynamics
     for excluded_tag in excluded_tags:
