@@ -23,6 +23,11 @@ favorite_tags = [
     {"name": "Robincest", "url": "https://archiveofourown.org/tags/Robincest/works", "tag_id": "1407900"},
     {"name": "Robinpile", "url": "https://archiveofourown.org/tags/robinpile/works", "tag_id": "2474063"},
     {"name": "Trans Tim Drake (DCU)", "url": "https://archiveofourown.org/tags/Trans%20Tim%20Drake%20(DCU)/works", "tag_id": "54440642"},
+    # New tags added
+    {"name": "Tim Drake/Dick Grayson/Jason Todd/Damian Wayne", "url": "https://archiveofourown.org/tags/Tim%20Drake*s*Dick%20Grayson*s*Jason%20Todd*s*Damian%20Wayne/works", "tag_id": "394948"},
+    {"name": "Stephanie Brown/Jason Todd", "url": "https://archiveofourown.org/tags/Stephanie%20Brown*s*Jason%20Todd/works", "tag_id": "79243"},
+    {"name": "Damian Wayne/Reader", "url": "https://archiveofourown.org/works?work_search%5Bsort_column%5D=revised_at&work_search%5Bother_tag_names%5D=Damian+Wayne%2FReader&tag_id=Damian+Wayne", "tag_id": "67567"},
+    {"name": "Dick Grayson/Damian Wayne", "url": "https://archiveofourown.org/tags/Dick%20Grayson*s*Damian%20Wayne/works", "tag_id": "71872"},
 ]
 
 # Headers to mimic a browser request and avoid caching
@@ -37,18 +42,31 @@ def create_filtered_url(tag_info):
     """Create a filtered URL for scraping from AO3"""
     base_url = tag_info["url"]
     
-    # Add our filtering parameters
-    params = {
-        "work_search[sort_column]": "revised_at",
-        "work_search[sort_direction]": "desc",
-        "work_search[language_id]": "en",
-        "exclude_work_search[freeform_ids][]": "272593",  # Exclude Alpha/Beta/Omega Dynamics
-        "commit": "Sort and Filter"
-    }
-    
-    # Convert to query string
-    params_str = urlencode(params)
-    return f"{base_url}?{params_str}"
+    # Check if URL already has parameters
+    if '?' in base_url:
+        # URL already has parameters, append our additional filters
+        # First, keep the existing parameters and add our filters
+        params = {
+            "work_search[language_id]": "en",
+            "exclude_work_search[freeform_ids][]": "272593",  # Exclude Alpha/Beta/Omega Dynamics
+        }
+        
+        # Create a parameter string to append
+        params_str = urlencode(params)
+        return f"{base_url}&{params_str}"
+    else:
+        # URL has no parameters, add all our filters
+        params = {
+            "work_search[sort_column]": "revised_at",
+            "work_search[sort_direction]": "desc",
+            "work_search[language_id]": "en",
+            "exclude_work_search[freeform_ids][]": "272593",  # Exclude Alpha/Beta/Omega Dynamics
+            "commit": "Sort and Filter"
+        }
+        
+        # Create a parameter string
+        params_str = urlencode(params)
+        return f"{base_url}?{params_str}"
 
 def create_rss_for_tag(tag_info):
     """Create an RSS feed for a tag with proper filtering"""
@@ -173,7 +191,7 @@ def create_rss_for_tag(tag_info):
 
 def get_rss_url(tag_info):
     """Get the RSS URL for a tag (our custom filtered feed)"""
-    safe_tag_name = re.sub(r'[^\w\s]', '', tag_info["name"]).replace(' ', '_').lower()
+    safe_tag_name = re.sub(r'[^\w\s]', '', tag_name).replace(' ', '_').lower()
     return f"https://mor-lays.github.io/ao3favtags/feeds/{safe_tag_name}.xml"
 
 def create_main_page():
@@ -206,9 +224,8 @@ def create_main_page():
 """
     
     for tag in favorite_tags:
-        rss_url = get_rss_url(tag)
-        # Add a timestamp parameter to prevent caching
-        timestamp = int(datetime.datetime.now().timestamp())
+        safe_tag_name = re.sub(r'[^\w\s]', '', tag["name"]).replace(' ', '_').lower()
+        rss_url = f"https://mor-lays.github.io/ao3favtags/feeds/{safe_tag_name}.xml"
         html_content += f"""        <li>
             <strong><a href="{tag['url']}" target="_blank">{tag['name']}</a></strong>
             <div class="feed-url">Feed URL: <a href="{rss_url}" target="_blank">{rss_url}</a></div>
