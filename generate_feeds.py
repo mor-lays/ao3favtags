@@ -7,25 +7,25 @@ import re
 import time
 from urllib.parse import quote
 
-# List of your favorite tags with their URLs
+# List of your favorite tags with their URLs and AO3 tag IDs
 favorite_tags = [
-    {"name": "Batfamily Members & Bruce Wayne", "url": "https://archiveofourown.org/tags/Batfamily%20Members%20*a*%20Bruce%20Wayne/works", "has_rss": False},
-    {"name": "Clark Kent/Bruce Wayne", "url": "https://archiveofourown.org/tags/Clark%20Kent*s*Bruce%20Wayne/works", "has_rss": False},
-    {"name": "Derek Hale/Stiles Stilinski", "url": "https://archiveofourown.org/tags/Derek%20Hale*s*Stiles%20Stilinski/works", "has_rss": False},
-    {"name": "Dick Grayson/Jason Todd", "url": "https://archiveofourown.org/tags/Dick%20Grayson*s*Jason%20Todd/works", "has_rss": False},
-    {"name": "Dom Bang Chan (Stray Kids)", "url": "https://archiveofourown.org/tags/Dom%20Bang%20Chan%20(Stray%20Kids)/works", "has_rss": False},
-    {"name": "Evan \"Buck\" Buckley/Eddie Diaz (9-1-1 TV)", "url": "https://archiveofourown.org/tags/Evan%20%22Buck%22%20Buckley*s*Eddie%20Diaz%20(9-1-1%20TV)/works", "has_rss": False},
-    {"name": "Hal Jordan (Green Lantern)/Bruce Wayne", "url": "https://archiveofourown.org/tags/Hal%20Jordan%20(Green%20Lantern)*s*Bruce%20Wayne/works", "has_rss": False},
-    {"name": "Jason Todd/Reader", "url": "https://archiveofourown.org/tags/Jason%20Todd*s*Reader/works", "has_rss": False},
-    {"name": "Marinette Dupain-Cheng | Ladybug/Damian Wayne", "url": "https://archiveofourown.org/tags/Marinette%20Dupain-Cheng%20%7C%20Ladybug*s*Damian%20Wayne/works", "has_rss": False},
-    {"name": "Merlin/Arthur Pendragon (Merlin)", "url": "https://archiveofourown.org/tags/Merlin*s*Arthur%20Pendragon%20(Merlin)/works", "has_rss": False},
-    {"name": "Pack Alpha Derek Hale", "url": "https://archiveofourown.org/tags/Pack%20Alpha%20Derek%20Hale/works", "has_rss": False},
-    {"name": "Tim Drake/Damian Wayne", "url": "https://archiveofourown.org/tags/Tim%20Drake*s*Damian%20Wayne/works", "has_rss": False},
-    {"name": "Trans Tim Drake (DCU)", "url": "https://archiveofourown.org/tags/Trans%20Tim%20Drake%20(DCU)/works", "has_rss": False},
+    {"name": "Batfamily Members & Bruce Wayne", "url": "https://archiveofourown.org/tags/Batfamily%20Members%20*a*%20Bruce%20Wayne/works", "has_rss": False, "tag_id": None},
+    {"name": "Clark Kent/Bruce Wayne", "url": "https://archiveofourown.org/tags/Clark%20Kent*s*Bruce%20Wayne/works", "has_rss": True, "tag_id": "6624"},
+    {"name": "Derek Hale/Stiles Stilinski", "url": "https://archiveofourown.org/tags/Derek%20Hale*s*Stiles%20Stilinski/works", "has_rss": False, "tag_id": None},
+    {"name": "Dick Grayson/Jason Todd", "url": "https://archiveofourown.org/tags/Dick%20Grayson*s*Jason%20Todd/works", "has_rss": False, "tag_id": None},
+    {"name": "Dom Bang Chan (Stray Kids)", "url": "https://archiveofourown.org/tags/Dom%20Bang%20Chan%20(Stray%20Kids)/works", "has_rss": False, "tag_id": None},
+    {"name": "Evan \"Buck\" Buckley/Eddie Diaz (9-1-1 TV)", "url": "https://archiveofourown.org/tags/Evan%20%22Buck%22%20Buckley*s*Eddie%20Diaz%20(9-1-1%20TV)/works", "has_rss": False, "tag_id": None},
+    {"name": "Hal Jordan (Green Lantern)/Bruce Wayne", "url": "https://archiveofourown.org/tags/Hal%20Jordan%20(Green%20Lantern)*s*Bruce%20Wayne/works", "has_rss": False, "tag_id": None},
+    {"name": "Jason Todd/Reader", "url": "https://archiveofourown.org/tags/Jason%20Todd*s*Reader/works", "has_rss": False, "tag_id": None},
+    {"name": "Marinette Dupain-Cheng | Ladybug/Damian Wayne", "url": "https://archiveofourown.org/tags/Marinette%20Dupain-Cheng%20%7C%20Ladybug*s*Damian%20Wayne/works", "has_rss": False, "tag_id": None},
+    {"name": "Merlin/Arthur Pendragon (Merlin)", "url": "https://archiveofourown.org/tags/Merlin*s*Arthur%20Pendragon%20(Merlin)/works", "has_rss": False, "tag_id": None},
+    {"name": "Pack Alpha Derek Hale", "url": "https://archiveofourown.org/tags/Pack%20Alpha%20Derek%20Hale/works", "has_rss": False, "tag_id": None},
+    {"name": "Tim Drake/Damian Wayne", "url": "https://archiveofourown.org/tags/Tim%20Drake*s*Damian%20Wayne/works", "has_rss": False, "tag_id": None},
+    {"name": "Trans Tim Drake (DCU)", "url": "https://archiveofourown.org/tags/Trans%20Tim%20Drake%20(DCU)/works", "has_rss": False, "tag_id": None},
 ]
 
-# Excluded tags
-excluded_tags = ['Alpha/Beta/Omega Dynamics']
+# Excluded tag IDs (Alpha/Beta/Omega Dynamics)
+excluded_tag_ids = ['272593']
 
 # Headers to mimic a browser request and avoid caching
 headers = {
@@ -42,16 +42,15 @@ def create_rss_for_tag(tag_info):
     # Start with a clean URL
     url = tag_info["url"]
     
-    # Add explicit sorting by updated date (descending order)
+    # Sort by most recent updates
     url += "?work_search%5Bsort_column%5D=revised_at&work_search%5Bsort_direction%5D=desc"
     
-    # Filter out explicit works by including all other ratings
-    # Rating IDs: 10=General, 11=Teen, 12=Mature, 9=Not Rated
-    url += "&work_search%5Brating_ids%5D%5B%5D=10&work_search%5Brating_ids%5D%5B%5D=11&work_search%5Brating_ids%5D%5B%5D=12&work_search%5Brating_ids%5D%5B%5D=9"
+    # Filter for English works only
+    url += "&work_search%5Blanguage_id%5D=en"
     
-    # Add filter to exclude Alpha/Beta/Omega Dynamics
-    for excluded_tag in excluded_tags:
-        url += f"&work_search%5Bexcluded_tag_names%5D={quote(excluded_tag)}"
+    # Add filter to exclude ABO by tag ID (more reliable)
+    for tag_id in excluded_tag_ids:
+        url += f"&exclude_work_search%5Bfreeform_ids%5D%5B%5D={tag_id}"
     
     print(f"Fetching works from: {url}")
     
@@ -80,7 +79,7 @@ def create_rss_for_tag(tag_info):
             language="en"
         )
         
-        for work in works[:20]:  # Get the latest 20 works
+        for work in works[:50]:  # Get the latest 50 works
             title_element = work.select_one('h4.heading a')
             title = title_element.text.strip() if title_element else "Untitled Work"
             link = f"https://archiveofourown.org{title_element['href']}" if title_element else url
@@ -104,13 +103,47 @@ def create_rss_for_tag(tag_info):
             else:
                 date = datetime.datetime.now()
             
-            # Get additional info
+            # Get rating
+            rating_element = work.select_one('span.rating')
+            rating = rating_element.text.strip() if rating_element else "Unknown Rating"
+            
+            # Get language, word count, chapters, and kudos
+            stats = {}
+            
+            # Get language (should be English as per filter)
+            language_element = work.select_one('dl.stats dd.language')
+            language = language_element.text.strip() if language_element else "English"
+            stats["Language"] = language
+            
+            # Get word count
+            words_element = work.select_one('dl.stats dd.words')
+            words = words_element.text.strip() if words_element else "Unknown"
+            stats["Words"] = words
+            
+            # Get chapters
+            chapters_element = work.select_one('dl.stats dd.chapters')
+            chapters = chapters_element.text.strip() if chapters_element else "?"
+            stats["Chapters"] = chapters
+            
+            # Get kudos
+            kudos_element = work.select_one('dl.stats dd.kudos')
+            kudos = kudos_element.text.strip() if kudos_element else "0"
+            stats["Kudos"] = kudos
+            
+            # Get additional info (tags)
             meta_elements = work.select('ul.tags li')
             meta_content = ""
             for meta in meta_elements:
                 meta_content += f"<li>{meta.text.strip()}</li>"
             
-            content = f"<p><strong>Author:</strong> {author}</p><p><strong>Summary:</strong> {summary}</p><ul>{meta_content}</ul>"
+            # Create a stats table
+            stats_html = "<table style='width:100%; margin-top:10px; margin-bottom:10px; border:1px solid #ddd;'><tr>"
+            stats_html += f"<td><strong>Rating:</strong> {rating}</td>"
+            for key, value in stats.items():
+                stats_html += f"<td><strong>{key}:</strong> {value}</td>"
+            stats_html += "</tr></table>"
+            
+            content = f"<p><strong>Author:</strong> {author}</p>{stats_html}<p><strong>Summary:</strong> {summary}</p><ul>{meta_content}</ul>"
             
             feed.add_item(
                 title=title,
@@ -134,17 +167,24 @@ def create_rss_for_tag(tag_info):
         print(f"Error creating feed for {tag_name}: {e}")
         return None
 
+def get_feed_url_with_params(tag_id):
+    """Create a properly filtered URL for AO3 native feeds"""
+    base_url = f"https://archiveofourown.org/tags/{tag_id}/feed.atom"
+    # Add parameters to match our filtering
+    params = "?language_id=en"
+    # Add ABO exclusion
+    for tag_id in excluded_tag_ids:
+        params += f"&exclude_work_search[freeform_ids][]={tag_id}"
+    
+    return base_url + params
+
 def get_rss_url(tag_info):
     """Get the RSS URL for a tag, either from AO3 or our generated feed"""
-    if tag_info["has_rss"]:
-        # For native AO3 feeds, we need to correct the URL encoding
-        tag_url = tag_info["url"]
-        # Replace the works part with feed.atom
-        feed_url = tag_url.replace("/works", "/feed.atom")
-        # Return the corrected URL
-        return feed_url
+    if tag_info["has_rss"] and tag_info["tag_id"]:
+        # Use the direct AO3 feed URL with tag ID and filtering params
+        return get_feed_url_with_params(tag_info["tag_id"])
     
-    # For tags without RSS, use our generated feed
+    # For tags without RSS or tag ID, use our generated feed
     safe_tag_name = re.sub(r'[^\w\s]', '', tag_info["name"]).replace(' ', '_').lower()
     return f"https://mor-lays.github.io/ao3favtags/feeds/{safe_tag_name}.xml"
 
@@ -171,7 +211,7 @@ def create_main_page():
 <body>
     <h1>AO3 Favorite Tags RSS Feeds</h1>
     <p>Add these feeds to your favorite RSS reader to stay updated with new works.</p>
-    <p>Filters applied: No Explicit works, No Alpha/Beta/Omega Dynamics</p>
+    <p>Filters applied: English works only, No Alpha/Beta/Omega Dynamics, Sorted by most recent updates</p>
     <ul>
 """
     
@@ -195,11 +235,12 @@ def create_main_page():
         file.write(html_content)
 
 def main():
-    # Create RSS feeds for all tags
+    # Create RSS feeds for tags that don't have RSS support
     for tag in favorite_tags:
-        print(f"Creating RSS feed for {tag['name']}...")
-        create_rss_for_tag(tag)
-        time.sleep(3)  # Be nice to AO3's servers
+        if not tag["has_rss"] or not tag["tag_id"]:
+            print(f"Creating RSS feed for {tag['name']}...")
+            create_rss_for_tag(tag)
+            time.sleep(3)  # Be nice to AO3's servers
     
     # Create main HTML page
     create_main_page()
