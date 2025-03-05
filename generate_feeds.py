@@ -28,33 +28,15 @@ favorite_tags = [
 # Common filter parameters
 common_params = {
     "work_search[language_id]": "en",                      # English only
-    "work_search[sort_column]": "revised_at",              # Sort by date updated
-    "work_search[sort_direction]": "desc",                 # Most recent first
     "exclude_work_search[freeform_ids][]": "272593"        # Exclude Alpha/Beta/Omega Dynamics
-}
-
-# Headers to mimic a browser request and avoid caching
-headers = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-    'Cache-Control': 'no-cache, no-store, must-revalidate',
-    'Pragma': 'no-cache',
-    'Expires': '0'
 }
 
 def get_filtered_ao3_feed_url(tag_id):
     """Create a filtered AO3 feed URL with the appropriate parameters"""
     base_url = f"https://archiveofourown.org/tags/{tag_id}/feed.atom"
     
-    # Format the parameters for the URL, removing sort-related params
-    # as these don't work in feed URLs the same way
-    feed_params = common_params.copy()
-    
-    # Remove sort params as they don't apply to feeds
-    feed_params.pop("work_search[sort_column]", None)
-    feed_params.pop("work_search[sort_direction]", None)
-    
-    # Convert to query string
-    params_str = urlencode(feed_params)
+    # Format the parameters for the URL
+    params_str = urlencode(common_params)
     if params_str:
         return f"{base_url}?{params_str}"
     else:
@@ -93,15 +75,13 @@ def create_main_page():
 <body>
     <h1>AO3 Favorite Tags RSS Feeds</h1>
     <p>Add these feeds to your favorite RSS reader to stay updated with new works.</p>
-    <p>Filters applied: English works only, No Alpha/Beta/Omega Dynamics, Sorted by most recent updates</p>
+    <p>Filters applied: English works only, No Alpha/Beta/Omega Dynamics</p>
+    <p>Updates: Daily at 12:00 UTC</p>
     <ul>
 """
     
     for tag in favorite_tags:
         rss_url = get_rss_url(tag)
-        # Add a timestamp parameter to prevent caching
-        timestamp = int(datetime.datetime.now().timestamp())
-        rss_url_with_timestamp = f"{rss_url}{('&' if '?' in rss_url else '?')}t={timestamp}"
         html_content += f"""        <li>
             <strong><a href="{tag['url']}" target="_blank">{tag['name']}</a></strong>
             <div class="feed-url">Feed URL: <a href="{rss_url}" target="_blank">{rss_url}</a></div>
